@@ -313,17 +313,46 @@ function Game() {
   const weapon = WEAPONS[hud.weapon];
 
   if (screen === "menu") {
+    const sel = CHARACTERS[character];
+    const selWeapon = WEAPONS[sel.weapon];
     return (
-      <main className="flex min-h-screen w-full items-center justify-center bg-background px-4 py-8">
-        <div className="w-full max-w-md">
-          <h1 className="text-center text-5xl font-black leading-none tracking-tight text-foreground">
-            VOID <span className="text-primary">ARENA</span>
-          </h1>
-          <p className="mt-2 text-center text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-            Best {best > 0 ? best : "—"}
-          </p>
+      <main className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-void px-4 py-10">
+        <div className="pointer-events-none absolute inset-0 bg-grid opacity-60" />
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="animate-scan h-1/3 w-full bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
+        </div>
 
-          <div className="mt-6 grid grid-cols-4 gap-2">
+        <div className="animate-float-up relative w-full max-w-lg rounded-3xl border border-border bg-card/50 p-6 shadow-soft backdrop-blur-xl sm:p-8">
+          <div className="text-center">
+            <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-primary/80">
+              Endless survival
+            </p>
+            <h1 className="mt-2 text-5xl font-black leading-none tracking-tight text-foreground text-glow sm:text-6xl">
+              VOID <span className="bg-gradient-to-r from-primary to-accent-foreground/70 bg-clip-text text-transparent">ARENA</span>
+            </h1>
+            <div className="mt-4 flex items-center justify-center gap-3 text-[11px] font-bold uppercase tracking-[0.25em] text-muted-foreground">
+              <span className="rounded-full border border-border bg-background/40 px-3 py-1">
+                Best <span className="text-amber">{best > 0 ? best : "—"}</span>
+              </span>
+              <button
+                onClick={() => {
+                  const next = !muted;
+                  initAudio();
+                  setMuted(next);
+                  setMutedState(next);
+                }}
+                aria-label={muted ? "Unmute sound" : "Mute sound"}
+                className="rounded-full border border-border bg-background/40 px-3 py-1 tracking-[0.25em] transition-colors hover:border-primary/60 hover:text-foreground"
+              >
+                {muted ? "🔇 Muted" : "🔊 Sound"}
+              </button>
+            </div>
+          </div>
+
+          <p className="mt-7 text-center text-[10px] font-bold uppercase tracking-[0.4em] text-muted-foreground">
+            Choose operative
+          </p>
+          <div className="mt-3 grid grid-cols-4 gap-2 sm:gap-3">
             {PLAYER_CHARACTERS.map((c) => {
               const stat = CHARACTERS[c.key];
               const active = character === c.key;
@@ -334,14 +363,16 @@ function Game() {
                     playSfx("ui");
                     setCharacter(c.key);
                   }}
-                  className={`rounded-lg border p-2 text-center ${
-                    active ? "border-primary bg-primary/10" : "border-border bg-card/60"
+                  className={`group relative overflow-hidden rounded-2xl border p-2 text-center transition-all duration-200 ${
+                    active
+                      ? "border-primary bg-primary/10 shadow-glow"
+                      : "border-border bg-background/30 hover:-translate-y-0.5 hover:border-primary/50"
                   }`}
                 >
                   <div
                     role="img"
                     aria-label={`${stat.name} operative`}
-                    className="mx-auto h-16 w-12"
+                    className="mx-auto h-16 w-12 transition-transform duration-200 group-hover:scale-110"
                     style={{
                       backgroundImage: `url(${c.portrait})`,
                       backgroundSize: `${c.frames * 100}% 100%`,
@@ -350,10 +381,48 @@ function Game() {
                       imageRendering: "pixelated",
                     }}
                   />
-                  <p className="mt-1 text-xs font-bold text-foreground">{stat.name}</p>
+                  <p
+                    className={`mt-1 text-[11px] font-black uppercase tracking-wider ${active ? "text-primary" : "text-foreground"}`}
+                  >
+                    {stat.name}
+                  </p>
                 </button>
               );
             })}
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-border bg-background/40 p-4">
+            <div className="flex items-baseline justify-between gap-3">
+              <p className="text-lg font-black uppercase tracking-wide text-foreground">
+                {sel.name}
+              </p>
+              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: selWeapon.color }}>
+                {selWeapon.name}
+              </p>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">{sel.blurb}</p>
+            <div className="mt-3 space-y-2">
+              {[
+                { label: "Health", value: sel.hp / 150, text: String(sel.hp) },
+                { label: "Speed", value: sel.speed / 340, text: String(sel.speed) },
+                { label: "Damage", value: sel.damage / 2, text: `×${sel.damage}` },
+              ].map((row) => (
+                <div key={row.label} className="flex items-center gap-3">
+                  <span className="w-16 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                    {row.label}
+                  </span>
+                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-secondary">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-primary to-amber transition-[width] duration-300"
+                      style={{ width: `${Math.min(100, row.value * 100)}%` }}
+                    />
+                  </div>
+                  <span className="w-10 text-right text-[11px] font-bold tabular-nums text-foreground">
+                    {row.text}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
 
           <button
@@ -365,18 +434,20 @@ function Game() {
               setRestartKey((k) => k + 1);
               setScreen("play");
             }}
-            className="mt-6 w-full rounded-xl bg-primary py-4 text-lg font-black uppercase tracking-[0.25em] text-primary-foreground disabled:opacity-50"
+            className="animate-pulse-glow mt-6 w-full rounded-2xl bg-gradient-to-r from-primary to-accent py-4 text-lg font-black uppercase tracking-[0.3em] text-primary-foreground transition-transform duration-200 hover:scale-[1.02] disabled:animate-none disabled:opacity-50"
           >
             {ready ? "Play" : "Loading…"}
           </button>
 
-          <p className="mt-3 text-center text-[11px] text-muted-foreground">
-            Move to survive · the gun auto-tracks in close · hold fire to aim yourself for +35% damage
+          <p className="mt-4 text-center text-[11px] leading-relaxed text-muted-foreground">
+            Move to survive · the gun auto-tracks in close · hold fire to aim yourself for{" "}
+            <span className="font-bold text-amber">+35% damage</span>
           </p>
         </div>
       </main>
     );
   }
+
 
 
 
