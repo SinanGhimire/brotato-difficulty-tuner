@@ -21,10 +21,10 @@ export interface Breed {
 }
 
 export const BREEDS: Breed[] = [
-  { id: "common", prefix: "", tint: "", hpMul: 1, speedMul: 1, dmgMul: 1, scaleMul: 1, scoreMul: 1, minWave: 1, weight: 8 },
-  { id: "feral", prefix: "Feral", tint: "", hpMul: 0.85, speedMul: 1.35, dmgMul: 1, scaleMul: 0.94, scoreMul: 1.4, minWave: 2, weight: 3 },
-  { id: "hulking", prefix: "Hulking", tint: "", hpMul: 1.8, speedMul: 0.8, dmgMul: 1.35, scaleMul: 1.2, scoreMul: 1.8, minWave: 4, weight: 2 },
-  { id: "cursed", prefix: "Cursed", tint: "", hpMul: 1.5, speedMul: 1.15, dmgMul: 1.4, scaleMul: 1.05, scoreMul: 2.4, minWave: 6, weight: 1.4 },
+  { id: "common", prefix: "", tint: "", hpMul: 1, speedMul: 1, dmgMul: 1, scaleMul: 1, scoreMul: 1, minWave: 1, weight: 4 },
+  { id: "feral", prefix: "Feral", tint: "", hpMul: 0.85, speedMul: 1.35, dmgMul: 1, scaleMul: 0.94, scoreMul: 1.4, minWave: 1, weight: 3 },
+  { id: "hulking", prefix: "Hulking", tint: "", hpMul: 1.8, speedMul: 0.8, dmgMul: 1.35, scaleMul: 1.2, scoreMul: 1.8, minWave: 2, weight: 2.4 },
+  { id: "cursed", prefix: "Cursed", tint: "", hpMul: 1.5, speedMul: 1.15, dmgMul: 1.4, scaleMul: 1.05, scoreMul: 2.4, minWave: 3, weight: 2 },
 ];
 
 export const BREED_MAP: Record<string, Breed> = Object.fromEntries(

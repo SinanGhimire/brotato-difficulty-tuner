@@ -29,11 +29,11 @@ const MUZZLE_DISTANCE = 46;
 
 /* ---- aim assist balance knobs ---- */
 /** how far the auto-targeting can reach (world px) */
-const AUTO_RANGE = 430;
+const AUTO_RANGE = 360;
 /** turret swing speed of the auto-aim, rad/s */
-const AIM_TURN_SPEED = 6.2;
+const AIM_TURN_SPEED = 4.4;
 /** auto-fire is slower than firing yourself */
-const AUTO_RATE_PENALTY = 1.28;
+const AUTO_RATE_PENALTY = 1.45;
 /** damage bonus for aiming and firing manually */
 const FOCUS_DAMAGE_BONUS = 1.35;
 
@@ -184,7 +184,7 @@ const STATS: Record<Species, SpeciesStat> = {
     color: "#dfe4ee",
     damage: 8,
     minWave: 1,
-    weight: 3,
+    weight: 1.6,
   },
   crusader: {
     sprite: "crusader",
@@ -195,8 +195,8 @@ const STATS: Record<Species, SpeciesStat> = {
     height: 86,
     color: "#c9a24a",
     damage: 11,
-    minWave: 2,
-    weight: 2.2,
+    minWave: 1,
+    weight: 1.5,
   },
   golem: {
     sprite: "golem",
@@ -207,8 +207,8 @@ const STATS: Record<Species, SpeciesStat> = {
     height: 112,
     color: "#7fd3e8",
     damage: 17,
-    minWave: 3,
-    weight: 1.5,
+    minWave: 2,
+    weight: 1.3,
   },
   minotaur: {
     sprite: "minotaur",
@@ -219,7 +219,7 @@ const STATS: Record<Species, SpeciesStat> = {
     height: 104,
     color: "#e0764a",
     damage: 15,
-    minWave: 4,
+    minWave: 2,
     weight: 1.3,
   },
   troll: {
@@ -231,8 +231,8 @@ const STATS: Record<Species, SpeciesStat> = {
     height: 168,
     color: "#a8c05a",
     damage: 26,
-    minWave: 5,
-    weight: 0.7,
+    minWave: 4,
+    weight: 1.0,
   },
   shambler: {
     sprite: "grunt",
@@ -244,7 +244,7 @@ const STATS: Record<Species, SpeciesStat> = {
     color: "#b45de0",
     damage: 8,
     minWave: 1,
-    weight: 2.6,
+    weight: 1.5,
   },
   spitter: {
     sprite: "spiker",
@@ -256,7 +256,7 @@ const STATS: Record<Species, SpeciesStat> = {
     color: "#9ec95a",
     damage: 9,
     minWave: 1,
-    weight: 2.2,
+    weight: 1.5,
   },
   flyer: {
     sprite: "flyer",
@@ -267,8 +267,8 @@ const STATS: Record<Species, SpeciesStat> = {
     height: 70,
     color: "#6fd9ff",
     damage: 9,
-    minWave: 3,
-    weight: 1.6,
+    minWave: 2,
+    weight: 1.4,
   },
   brute: {
     sprite: "brute",
@@ -279,7 +279,7 @@ const STATS: Record<Species, SpeciesStat> = {
     height: 108,
     color: "#ff7f6a",
     damage: 18,
-    minWave: 4,
+    minWave: 3,
     weight: 1.2,
   },
 };
@@ -731,16 +731,17 @@ function explode(s: GameState, x: number, y: number, radius: number, damage: num
 function dropPickup(s: GameState, x: number, y: number, species: Species) {
   const roll = Math.random();
   const bigKill = species === "troll" || species === "golem";
-  if (!bigKill && roll > 0.34) return;
+  if (!bigKill && roll > 0.16) return;
+  if (bigKill && roll > 0.6) return;
   let kind: PickupKind;
   let weapon: WeaponKey | undefined;
   const r2 = Math.random();
-  if (r2 < 0.34) kind = "health";
-  else if (r2 < 0.66) {
+  if (r2 < 0.2) kind = "health";
+  else if (r2 < 0.34) {
     kind = "weapon";
     weapon = pick(["pistol", "rifle", "shotgun", "minigun"] as WeaponKey[]);
-  } else if (r2 < 0.79) kind = "speed";
-  else if (r2 < 0.9) kind = "rate";
+  } else if (r2 < 0.6) kind = "speed";
+  else if (r2 < 0.8) kind = "rate";
   else kind = "damage";
 
   s.pickups.push({
@@ -748,7 +749,7 @@ function dropPickup(s: GameState, x: number, y: number, species: Species) {
     y,
     kind,
     weapon,
-    life: 22,
+    life: 18,
     bob: Math.random() * Math.PI * 2,
   });
 }
@@ -762,14 +763,14 @@ function scatterLoot(s: GameState) {
   const r = Math.random();
   let kind: PickupKind;
   let weapon: WeaponKey | undefined;
-  if (r < 0.34) kind = "health";
-  else if (r < 0.7) {
+  if (r < 0.18) kind = "health";
+  else if (r < 0.34) {
     kind = "weapon";
     weapon = pick(["pistol", "rifle", "shotgun", "minigun"] as WeaponKey[]);
-  } else if (r < 0.8) kind = "speed";
-  else if (r < 0.9) kind = "rate";
+  } else if (r < 0.6) kind = "speed";
+  else if (r < 0.8) kind = "rate";
   else kind = "damage";
-  s.pickups.push({ x, y, kind, weapon, life: 40, bob: Math.random() * Math.PI * 2 });
+  s.pickups.push({ x, y, kind, weapon, life: 30, bob: Math.random() * Math.PI * 2 });
 }
 
 /* --------------------------------- shooting --------------------------------- */
@@ -1035,7 +1036,7 @@ export function update(s: GameState, input: Input, dt: number) {
     const step = Math.min(Math.abs(diff), AIM_TURN_SPEED * dt) * Math.sign(diff);
     p.aim += step;
     // only shoots once the barrel has actually swung onto the target
-    onTarget = Math.abs(diff) - Math.abs(step) < 0.14;
+    onTarget = Math.abs(diff) - Math.abs(step) < 0.10;
     s.mouseX = tx;
     s.mouseY = ty;
   } else {
