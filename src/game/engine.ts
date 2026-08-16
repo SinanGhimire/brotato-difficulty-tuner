@@ -1871,18 +1871,8 @@ export function render(ctx: CanvasRenderingContext2D, s: GameState, sprites: Spr
     ctx.restore();
   }
 
-  // aim-assist reach ring — shows exactly where the gun stops helping you
-  if (!s.over) {
-    ctx.save();
-    ctx.globalAlpha = 0.2;
-    ctx.strokeStyle = "#8fd8ff";
-    ctx.lineWidth = 2;
-    ctx.setLineDash([10, 14]);
-    ctx.beginPath();
-    ctx.arc(p.x, p.y - BODY_Y, AUTO_RANGE, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
-  }
+
+
 
   // reticle: dim while the gun auto-tracks, bright when you take manual aim
   if (!s.over) {
