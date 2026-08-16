@@ -77,14 +77,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Echo Vanguards" },
+      { name: "description", content: "Survive endless zombie waves in Void Arena. Every 30 seconds your past self returns as an Echo and fights beside you. WASD to move, mouse to aim." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Echo Vanguards" },
+      { property: "og:description", content: "Survive endless zombie waves in Void Arena. Every 30 seconds your past self returns as an Echo and fights beside you. WASD to move, mouse to aim." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Echo Vanguards" },
+      { name: "twitter:description", content: "Survive endless zombie waves in Void Arena. Every 30 seconds your past self returns as an Echo and fights beside you. WASD to move, mouse to aim." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0a51f28450c2797797bcd9d316f991f9/id-preview-5ed61647--ff56e7e0-d8c3-4626-860f-a5fda950885f.lovable.app-1786801413369.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0a51f28450c2797797bcd9d316f991f9/id-preview-5ed61647--ff56e7e0-d8c3-4626-860f-a5fda950885f.lovable.app-1786801413369.png" },
     ],
     links: [
       {
@@ -102,7 +106,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <HeadContent />
       </head>
