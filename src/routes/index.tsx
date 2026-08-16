@@ -581,15 +581,17 @@ function Game() {
         )}
 
         {hud.offers.length > 0 && !hud.over && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 rounded-xl bg-background/90 p-4 backdrop-blur">
-            <div className="text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary">
-                Level {hud.level}
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 rounded-xl bg-background/85 p-4 backdrop-blur-xl">
+            <div className="animate-float-up text-center">
+              <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-primary">
+                Level {hud.level} reached
               </p>
-              <h2 className="text-3xl font-black text-foreground">Choose an upgrade</h2>
+              <h2 className="mt-1 text-3xl font-black uppercase tracking-tight text-foreground text-glow sm:text-4xl">
+                Choose an upgrade
+              </h2>
             </div>
             <div className="pointer-events-auto grid w-full max-w-3xl gap-3 sm:grid-cols-3">
-              {hud.offers.map((id) => {
+              {hud.offers.map((id, i) => {
                 const u = UPGRADE_MAP[id];
                 if (!u) return null;
                 const col = RARITY_COLOR[u.rarity];
@@ -601,24 +603,37 @@ function Game() {
                       applyUpgrade(stateRef.current, id);
                       setHud((h) => ({ ...h, offers: [], paused: false }));
                     }}
-                    className="rounded-xl border bg-card/80 p-4 text-left transition-transform hover:scale-[1.03]"
-                    style={{ borderColor: col, boxShadow: `0 0 30px -14px ${col}` }}
+                    className="animate-float-up group relative overflow-hidden rounded-2xl border bg-card/70 p-4 text-left backdrop-blur transition-all duration-200 hover:-translate-y-1 hover:scale-[1.02]"
+                    style={{
+                      borderColor: col,
+                      boxShadow: `0 18px 40px -22px ${col}`,
+                      animationDelay: `${i * 70}ms`,
+                    }}
                   >
+                    <div
+                      className="pointer-events-none absolute inset-x-0 top-0 h-px opacity-70"
+                      style={{ background: col }}
+                    />
                     <div className="flex items-center justify-between">
-                      <span className="text-2xl" style={{ color: col }}>
+                      <span
+                        className="text-3xl transition-transform duration-200 group-hover:scale-110"
+                        style={{ color: col }}
+                      >
                         {u.icon}
                       </span>
                       <span
-                        className="text-[10px] font-bold uppercase tracking-[0.2em]"
-                        style={{ color: col }}
+                        className="rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em]"
+                        style={{ color: col, borderColor: col }}
                       >
                         {u.rarity}
                       </span>
                     </div>
-                    <p className="mt-2 text-base font-bold text-foreground">{u.name}</p>
-                    <p className="text-xs text-muted-foreground">{u.desc}</p>
+                    <p className="mt-3 text-base font-black uppercase tracking-wide text-foreground">
+                      {u.name}
+                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{u.desc}</p>
                     {stacks > 0 && (
-                      <p className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
                         owned ×{stacks}
                       </p>
                     )}
@@ -630,40 +645,78 @@ function Game() {
         )}
 
         {hud.paused && hud.offers.length === 0 && !hud.over && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-xl bg-background/85 backdrop-blur">
-            <h2 className="text-3xl font-black text-foreground">Paused</h2>
-            <p className="text-sm text-muted-foreground">
-              Wave {hud.wave} · Level {hud.level} · {hud.kills} kills
-            </p>
-            <p className="text-xs text-muted-foreground">Press Esc or P to resume</p>
+          <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-background/80 p-4 backdrop-blur-xl">
+            <div className="animate-float-up w-full max-w-sm rounded-2xl border border-border bg-card/60 p-6 text-center shadow-soft">
+              <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-primary">
+                Standby
+              </p>
+              <h2 className="mt-1 text-4xl font-black uppercase tracking-tight text-foreground text-glow">
+                Paused
+              </h2>
+              <div className="mt-5 grid grid-cols-3 gap-2">
+                {[
+                  { k: "Wave", v: hud.wave },
+                  { k: "Level", v: hud.level },
+                  { k: "Kills", v: hud.kills },
+                ].map((st) => (
+                  <div key={st.k} className="rounded-xl border border-border bg-background/40 py-2">
+                    <p className="text-lg font-black tabular-nums text-foreground">{st.v}</p>
+                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                      {st.k}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-5 text-xs text-muted-foreground">Press Esc or P to resume</p>
+            </div>
           </div>
         )}
 
         {hud.over && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 rounded-xl bg-background/85 backdrop-blur">
-            <h2 className="text-4xl font-bold text-foreground">You died</h2>
-            <p className="text-muted-foreground">
-              Wave {hud.wave} · Score {hud.score} · Level {hud.level}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {hud.kills} kills · {Math.floor(hud.time)}s survived
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setRestartKey((k) => k + 1)}
-                className="rounded-md bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-              >
-                Play again
-              </button>
-              <button
-                onClick={() => setScreen("menu")}
-                className="rounded-md border border-border px-6 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-accent"
-              >
-                Main menu
-              </button>
+          <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-background/85 p-4 backdrop-blur-xl">
+            <div className="animate-float-up w-full max-w-md rounded-2xl border border-destructive/40 bg-card/60 p-6 text-center shadow-soft">
+              <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-destructive">
+                Signal lost
+              </p>
+              <h2 className="mt-1 text-4xl font-black uppercase tracking-tight text-foreground">
+                You died
+              </h2>
+              <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {[
+                  { k: "Score", v: hud.score },
+                  { k: "Wave", v: hud.wave },
+                  { k: "Kills", v: hud.kills },
+                  { k: "Time", v: `${Math.floor(hud.time)}s` },
+                ].map((st) => (
+                  <div key={st.k} className="rounded-xl border border-border bg-background/40 py-2">
+                    <p className="text-lg font-black tabular-nums text-foreground">{st.v}</p>
+                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                      {st.k}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-4 text-[11px] font-bold uppercase tracking-[0.3em] text-muted-foreground">
+                Best <span className="text-amber">{Math.max(best, hud.score)}</span>
+              </p>
+              <div className="mt-5 flex justify-center gap-3">
+                <button
+                  onClick={() => setRestartKey((k) => k + 1)}
+                  className="rounded-xl bg-gradient-to-r from-primary to-accent px-6 py-2.5 text-xs font-black uppercase tracking-[0.2em] text-primary-foreground transition-transform hover:scale-[1.03]"
+                >
+                  Play again
+                </button>
+                <button
+                  onClick={() => setScreen("menu")}
+                  className="rounded-xl border border-border px-6 py-2.5 text-xs font-black uppercase tracking-[0.2em] text-foreground transition-colors hover:bg-accent"
+                >
+                  Main menu
+                </button>
+              </div>
             </div>
           </div>
         )}
+
       </div>
     </main>
   );
