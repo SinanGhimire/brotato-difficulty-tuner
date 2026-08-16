@@ -452,7 +452,9 @@ function Game() {
 
 
   return (
-    <main className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-background p-2 sm:p-4">
+    <main className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-void p-2 sm:p-4">
+      <div className="pointer-events-none absolute inset-0 bg-grid opacity-40" />
+
       <h1 className="sr-only">Void Arena — 2D top-down arena shooter</h1>
 
       <div
